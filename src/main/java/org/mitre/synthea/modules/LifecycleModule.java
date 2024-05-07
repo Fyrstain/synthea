@@ -302,9 +302,17 @@ public final class LifecycleModule extends Module {
         if (person.attributes.get(Person.NAME_PREFIX) == null) {
           String namePrefix;
           if ("M".equals(person.attributes.get(Person.GENDER))) {
-            namePrefix = "Mr.";
+            if(Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+              namePrefix = "M.";
+            } else {
+              namePrefix = "Mr.";
+            }
           } else {
-            namePrefix = "Ms.";
+            if(Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+              namePrefix = "Mme.";
+            } else {
+              namePrefix = "Ms.";
+            }
           }
           person.attributes.put(Person.NAME_PREFIX, namePrefix);
         }
@@ -336,7 +344,7 @@ public final class LifecycleModule extends Module {
           if (getsMarried) {
             person.attributes.put(Person.MARITAL_STATUS, "M");
             if ("F".equals(person.attributes.get(Person.GENDER))) {
-              person.attributes.put(Person.NAME_PREFIX, "Mrs.");
+              person.attributes.put(Person.NAME_PREFIX, Config.getAsBoolean("exporter.fhir.use_fr_core_ig") ? "Mme." : "Mrs.");
               person.attributes.put(Person.MAIDEN_NAME, person.attributes.get(Person.LAST_NAME));
               String firstName = ((String) person.attributes.get(Person.FIRST_NAME));
               String middleName = null;
@@ -361,7 +369,8 @@ public final class LifecycleModule extends Module {
       case 30:
         // "overeducated" -> suffix
         if ((person.attributes.get(Person.NAME_SUFFIX) == null)
-            && ((double) person.attributes.get(Person.EDUCATION_LEVEL) >= 0.95)) {
+            && ((double) person.attributes.get(Person.EDUCATION_LEVEL) >= 0.95)
+            && !Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
           List<String> suffixList = Arrays.asList("PhD", "JD", "MD");
           person.attributes.put(Person.NAME_SUFFIX,
               suffixList.get(person.randInt(suffixList.size())));

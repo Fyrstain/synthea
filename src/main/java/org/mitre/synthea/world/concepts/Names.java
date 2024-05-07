@@ -40,6 +40,8 @@ public class Names {
     List<String> choices;
     if ("spanish".equalsIgnoreCase(language)) {
       choices = (List<String>) names.get("spanish." + gender);
+    } else if ("french".equalsIgnoreCase(language)) {
+      choices = (List<String>) names.get("french." + gender);
     } else {
       choices = (List<String>) names.get("english." + gender);
     }
@@ -67,6 +69,8 @@ public class Names {
     List<String> choices;
     if ("spanish".equalsIgnoreCase(language)) {
       choices = (List<String>) names.get("spanish.family");
+    } else if ("french".equalsIgnoreCase(language)) {
+      choices = (List<String>) names.get("french.family");
     } else {
       choices = (List<String>) names.get("english.family");
     }
@@ -91,6 +95,10 @@ public class Names {
   public static String fakeAddress(boolean includeLine2, Person person) {
     int number = person.randInt(1000) + 100;
     List<String> n = (List<String>)names.get("english.family");
+    if (Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+      n = (List<String>)names.get("french.family");
+    }
+
     // for now just use family names as the street name.
     // could expand with a few more but probably not worth it
     String streetName = n.get(person.randInt(n.size()));
@@ -101,9 +109,13 @@ public class Names {
       int addtlNum = person.randInt(100);
       List<String> s = (List<String>)names.get("street.secondary");
       String addtlType = s.get(person.randInt(s.size()));
-      return number + " " + streetName + " " + streetType + " " + addtlType + " " + addtlNum;
+      return Config.getAsBoolean("exporter.fhir.use_fr_core_ig")
+              ? number + " " + streetType + " " + streetName + " " + addtlType + " " + addtlNum
+              : number + " " + streetName + " " + streetType + " " + addtlType + " " + addtlNum;
     } else {
-      return number + " " + streetName + " " + streetType;
+      return Config.getAsBoolean("exporter.fhir.use_fr_core_ig")
+              ? number + " " + streetType + " " + streetName
+              : number + " " + streetName + " " + streetType;
     }
   }
 

@@ -73,19 +73,28 @@ public class App {
         while (!argsQ.isEmpty()) {
           String currArg = argsQ.poll();
 
+          // Help command
           if (currArg.equalsIgnoreCase("-h")) {
             usage();
             System.exit(0);
-          } else if (currArg.equalsIgnoreCase("-s")) {
+          }
+          // Seed
+          else if (currArg.equalsIgnoreCase("-s")) {
             String value = argsQ.poll();
             options.seed = Long.parseLong(value);
-          } else if (currArg.equalsIgnoreCase("-cs")) {
+          }
+          // Clinical Seed
+          else if (currArg.equalsIgnoreCase("-cs")) {
             String value = argsQ.poll();
             options.clinicianSeed = Long.parseLong(value);
-          } else if (currArg.equalsIgnoreCase("-ps")) {
+          }
+          // Single Person Seed
+          else if (currArg.equalsIgnoreCase("-ps")) {
             String value = argsQ.poll();
             options.singlePersonSeed = Long.valueOf(value);
-          } else if (currArg.equalsIgnoreCase("-r")) {
+          }
+          // Reference Date
+          else if (currArg.equalsIgnoreCase("-r")) {
             String value = argsQ.poll();
             // note that Y = "week year" and y = "year" per the formatting guidelines
             // and D = "day in year" and d = "day in month", so what we actually want is yyyyMMdd
@@ -93,7 +102,9 @@ public class App {
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             options.referenceTime = format.parse(value).getTime();
-          } else if (currArg.equalsIgnoreCase("-e")) {
+          }
+          // End Date
+          else if (currArg.equalsIgnoreCase("-e")) {
             if (currArg.equals("-E")) {
               overrideFutureDateError = true;
             }
@@ -101,20 +112,28 @@ public class App {
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             options.endTime = format.parse(value).getTime();
-          } else if (currArg.equalsIgnoreCase("-p")) {
+          }
+          // Population Size
+          else if (currArg.equalsIgnoreCase("-p")) {
             String value = argsQ.poll();
             options.population = Integer.parseInt(value);
-          } else if (currArg.equalsIgnoreCase("-o")) {
+          }
+          // Overflow population
+          else if (currArg.equalsIgnoreCase("-o")) {
             String value = argsQ.poll();
             options.overflow = Boolean.parseBoolean(value);
-          } else if (currArg.equalsIgnoreCase("-g")) {
+          }
+          // Gender
+          else if (currArg.equalsIgnoreCase("-g")) {
             String value = argsQ.poll();
             if (value.equals("M") || value.equals("F")) {
               options.gender = value;
             } else {
               throw new Exception("Legal values for gender are 'M' or 'F'.");
             }
-          } else if (currArg.equalsIgnoreCase("-a")) {
+          }
+          // Age Range
+          else if (currArg.equalsIgnoreCase("-a")) {
             String value = argsQ.poll();
             if (value.contains("-")) {
               String[] values = value.split("-");
@@ -124,11 +143,15 @@ public class App {
             } else {
               throw new Exception("Age format: minAge-maxAge. E.g. 60-65.");
             }
-          } else if (currArg.equalsIgnoreCase("-m")) {
+          }
+          // Modules
+          else if (currArg.equalsIgnoreCase("-m")) {
             String value = argsQ.poll();
             String[] values = value.split(File.pathSeparator);
             options.enabledModules = Arrays.asList(values);
-          } else if (currArg.equalsIgnoreCase("-c")) {
+          }
+          // Local Config File
+          else if (currArg.equalsIgnoreCase("-c")) {
             String value = argsQ.poll();
             File configFile = new File(value);
             Config.load(configFile);
@@ -136,7 +159,9 @@ public class App {
             // file during options initialization need to be reset here.
             options.population = Config.getAsInteger("generate.default_population", 1);
             options.threadPoolSize = Config.getAsInteger("generate.thread_pool_size", -1);
-          } else if (currArg.equalsIgnoreCase("-d")) {
+          }
+          // Local module Dir
+          else if (currArg.equalsIgnoreCase("-d")) {
             String value = argsQ.poll();
             File localModuleDir = new File(value);
             if (localModuleDir.exists() && localModuleDir.isDirectory()) {
@@ -146,7 +171,9 @@ public class App {
                       "Specified local module directory (%s) is not a directory",
                       localModuleDir.getAbsolutePath()));
             }
-          } else if (currArg.equalsIgnoreCase("-u")) {
+          }
+          // Update Population Snapshot Path
+          else if (currArg.equalsIgnoreCase("-u")) {
             String value = argsQ.poll();
             failIfPhysiologyEnabled(currArg);
             File file = new File(value);
@@ -160,7 +187,9 @@ public class App {
               throw new IOException(String.format("Unable to create snapshot file (%s): %s",
                       file.getAbsolutePath(), ex.getMessage()));
             }
-          } else if (currArg.equalsIgnoreCase("-i")) {
+          }
+          // Initial Population Snapshot Path
+          else if (currArg.equalsIgnoreCase("-i")) {
             String value = argsQ.poll();
             failIfPhysiologyEnabled(currArg);
             File file = new File(value);
@@ -174,7 +203,9 @@ public class App {
               throw new IOException(String.format("Unable to load snapshot file (%s): %s",
                       file.getAbsolutePath(), ex.getMessage()));
             }
-          } else if (currArg.startsWith("-t")) {
+          }
+          // Update Time Period in days
+          else if (currArg.startsWith("-t")) {
             String value = argsQ.poll();
             try {
               options.daysToTravelForward = Integer.parseInt(value);
@@ -188,7 +219,9 @@ public class App {
                               value,
                               ex.getMessage()));
             }
-          } else if (currArg.equalsIgnoreCase("-f")) {
+          }
+          // Fixed Record Path
+          else if (currArg.equalsIgnoreCase("-f")) {
             String value = argsQ.poll();
             File fixedRecordPath = new File(value);
             if (fixedRecordPath.exists()) {
@@ -197,7 +230,9 @@ public class App {
               throw new FileNotFoundException(String.format(
                   "Specified fixed record file (%s) does not exist", value));
             }
-          } else if (currArg.equals("-k")) {
+          }
+          // Keep matching Patients Path
+          else if (currArg.equals("-k")) {
             String value = argsQ.poll();
             // first check if it's an absolute path, or path relative to .
             File keepPatientsModule = new File(value);
@@ -215,7 +250,9 @@ public class App {
                     "Specified keep-patients file (%s) does not exist", value));
               }
             }
-          } else if (currArg.equals("-fm")) {
+          }
+          // Flexporter Mapping file
+          else if (currArg.equals("-fm")) {
             String value = argsQ.poll();
             File flexporterMappingFile = new File(value);
             if (flexporterMappingFile.exists()) {
@@ -227,7 +264,9 @@ public class App {
               throw new FileNotFoundException(String.format(
                   "Specified flexporter mapping file (%s) does not exist", value));
             }
-          } else if (currArg.equals("-ig")) {
+          }
+          // IG Directory
+          else if (currArg.equals("-ig")) {
             String value = argsQ.poll();
             File igFile = new File(value);
             if (igFile.exists()) {
@@ -236,7 +275,9 @@ public class App {
               throw new FileNotFoundException(String.format(
                   "Specified IG directory (%s) does not exist", value));
             }
-          } else if (currArg.startsWith("--")) {
+          }
+          // Other confs (basically anything)
+          else if (currArg.startsWith("--")) {
             String configSetting;
             String value;
             // accept either:
@@ -252,9 +293,13 @@ public class App {
             }
 
             Config.set(configSetting, value);
-          } else if (options.state == null) {
+          }
+          // State if not exist
+          else if (options.state == null) {
             options.state = currArg;
-          } else {
+          }
+          // Else it's the city
+          else {
             // assume it must be the city
             options.city = currArg;
           }

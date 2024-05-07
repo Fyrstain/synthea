@@ -138,6 +138,9 @@ public class Demographics implements Comparable<Demographics>, Serializable {
    */
   public String languageFromRaceAndEthnicity(String race, String ethnicity,
       RandomNumberGenerator random) {
+    if (Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+      return "french";
+    }
     if (ethnicity.equals("hispanic")) {
       RandomCollection<String> hispanicLanguageUsage = new RandomCollection<>();
       // https://factfinder.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_17_5YR_B16006&prodType=table

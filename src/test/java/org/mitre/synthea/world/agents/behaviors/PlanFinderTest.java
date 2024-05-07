@@ -66,11 +66,11 @@ public class PlanFinderTest {
   @AfterClass
   public static void cleanup() throws Exception {
     Config.set("generate.payers.insurance_companies.default_file",
-        "payers/insurance_companies.csv");
+            "payers/insurance_companies_old.csv");
     Config.set("generate.payers.insurance_plans.default_file",
-        "payers/insurance_plans.csv");
+            "payers/insurance_plans_old.csv");
     Config.set("generate.payers.insurance_plans.eligibilities_file",
-        "payers/insurance_eligibilities.csv");
+            "payers/insurance_eligibilities_old.csv");
     Config.set("generate.payers.insurance_plans.income_premium_ratio", "0.034");
   }
 
