@@ -155,8 +155,13 @@ public final class LifecycleModule extends Module {
       attributes.put(Person.LAST_NAME, lastName);
       attributes.put(Person.NAME, firstName + " " + lastName);
 
-      String phoneNumber = "555-" + ((person.randInt(999 - 100 + 1) + 100)) + "-"
-          + ((person.randInt(9999 - 1000 + 1) + 1000));
+      String phoneNumber;
+      if(Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+        phoneNumber = "0" + ((person.randInt(999999999)));
+      } else {
+        phoneNumber = "555-" + ((person.randInt(999 - 100 + 1) + 100)) + "-"
+                + ((person.randInt(9999 - 1000 + 1) + 1000));
+      }
       attributes.put(Person.TELECOM, phoneNumber);
 
       boolean hasStreetAddress2 = person.rand() < 0.5;

@@ -10,18 +10,8 @@ import com.google.gson.JsonObject;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -745,6 +735,13 @@ public class FhirR4 {
     } else if (USE_FR_CORE_IG) {
       patientResource.getMeta().addProfile("https://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-patient");
 
+      patientResource.addExtension()
+              .setUrl("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-ident-reliability")
+              .addExtension().setUrl("validationMode")
+              .setValue(new Coding("http://interopsante.org/fhir/CodeSystem/fr-cs-mode-validation-identite",
+                      "CN",
+                      "Carte nationale d'identité"));
+
       // Social Security Number
       Code ssnCode = new Code("http://terminology.hl7.org/CodeSystem/v2-0203", "NH", "National Health Plan Identifier");
       patientResource.addIdentifier()
@@ -850,11 +847,11 @@ public class FhirR4 {
     }
 
     // Mothers Maiden Name
-    Extension mothersMaidenNameExtension = new Extension(
-            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
-    String mothersMaidenName = (String) person.attributes.get(Person.NAME_MOTHER);
-    mothersMaidenNameExtension.setValue(new StringType(mothersMaidenName));
-    patientResource.addExtension(mothersMaidenNameExtension);
+//    Extension mothersMaidenNameExtension = new Extension(
+//            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
+//    String mothersMaidenName = (String) person.attributes.get(Person.NAME_MOTHER);
+//    mothersMaidenNameExtension.setValue(new StringType(mothersMaidenName));
+//    patientResource.addExtension(mothersMaidenNameExtension);
 
     // Birthdate
     long birthdate = (long) person.attributes.get(Person.BIRTHDATE);
@@ -871,10 +868,9 @@ public class FhirR4 {
 
     // Multiple Birth
     if (person.attributes.get(Person.MULTIPLE_BIRTH_STATUS) != null) {
-      patientResource.setMultipleBirth(
-              new IntegerType((int) person.attributes.get(Person.MULTIPLE_BIRTH_STATUS)));
+      patientResource.setMultipleBirth(new IntegerType((new Random()).nextInt(5)));
     } else {
-      patientResource.setMultipleBirth(new BooleanType(false));
+      patientResource.setMultipleBirth(new IntegerType(1));
     }
 
     // Telephone contact
@@ -919,19 +915,19 @@ public class FhirR4 {
     // Synthea Extensions
     // DALY and QALY values
     // we only write the last(current) one to the patient record
-    Double dalyValue = (Double) person.attributes.get("most-recent-daly");
-    Double qalyValue = (Double) person.attributes.get("most-recent-qaly");
-    if (dalyValue != null) {
-      Extension dalyExtension = new Extension(SYNTHEA_EXT + "disability-adjusted-life-years");
-      DecimalType daly = new DecimalType(dalyValue);
-      dalyExtension.setValue(daly);
-      patientResource.addExtension(dalyExtension);
-
-      Extension qalyExtension = new Extension(SYNTHEA_EXT + "quality-adjusted-life-years");
-      DecimalType qaly = new DecimalType(qalyValue);
-      qalyExtension.setValue(qaly);
-      patientResource.addExtension(qalyExtension);
-    }
+//    Double dalyValue = (Double) person.attributes.get("most-recent-daly");
+//    Double qalyValue = (Double) person.attributes.get("most-recent-qaly");
+//    if (dalyValue != null) {
+//      Extension dalyExtension = new Extension(SYNTHEA_EXT + "disability-adjusted-life-years");
+//      DecimalType daly = new DecimalType(dalyValue);
+//      dalyExtension.setValue(daly);
+//      patientResource.addExtension(dalyExtension);
+//
+//      Extension qalyExtension = new Extension(SYNTHEA_EXT + "quality-adjusted-life-years");
+//      DecimalType qaly = new DecimalType(qalyValue);
+//      qalyExtension.setValue(qaly);
+//      patientResource.addExtension(qalyExtension);
+//    }
 
     return newEntry(bundle, patientResource, (String) person.attributes.get(Person.ID));
   }
