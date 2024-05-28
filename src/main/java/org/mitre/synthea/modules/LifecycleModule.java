@@ -195,13 +195,18 @@ public final class LifecycleModule extends Module {
       person.attributes.put(Person.ZIP, zipCode);
       person.attributes.put(Person.FIPS, Location.getFipsCodeByZipCode(zipCode));
       String[] birthPlace;
-      if ("english".equalsIgnoreCase((String) attributes.get(Person.FIRST_LANGUAGE))) {
+      if (Config.getAsBoolean("exporter.fhir.use_us_core_ig", true)
+              && "english".equalsIgnoreCase((String) attributes.get(Person.FIRST_LANGUAGE))) {
+        birthPlace = location.randomBirthPlace(person);
+      } else if (Config.getAsBoolean("exporter.fhir.use_fr_core_ig")
+              && "french".equalsIgnoreCase((String) attributes.get(Person.FIRST_LANGUAGE))) {
         birthPlace = location.randomBirthPlace(person);
       } else {
         birthPlace = location.randomBirthplaceByLanguage(
             person, (String) person.attributes.get(Person.FIRST_LANGUAGE));
       }
       attributes.put(Person.BIRTH_CITY, birthPlace[0]);
+      attributes.put(Person.BIRTH_CITY_INSEE, birthPlace[4]);
       attributes.put(Person.BIRTH_STATE, birthPlace[1]);
       attributes.put(Person.BIRTH_COUNTRY, birthPlace[2]);
       // For CSV exports so we don't break any existing schemas

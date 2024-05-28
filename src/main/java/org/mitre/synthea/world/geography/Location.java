@@ -283,11 +283,15 @@ public class Location implements Serializable {
    * @return Array of Strings: [city, state, country, "city, state, country"]
    */
   public String[] randomBirthPlace(RandomNumberGenerator random) {
-    String[] birthPlace = new String[4];
-    birthPlace[0] = randomCityName(random);
+    String[] birthPlace = new String[5];
+    String cityId = randomCityId(random);
+    Demographics randomCity = demographics.get(cityId);
+
+    birthPlace[0] = randomCity.city;
     birthPlace[1] = this.state;
     birthPlace[2] = COUNTRY_CODE;
     birthPlace[3] = birthPlace[0] + ", " + birthPlace[1] + ", " + birthPlace[2];
+    birthPlace[4] = randomCity.cityInsee;
     return birthPlace;
   }
 

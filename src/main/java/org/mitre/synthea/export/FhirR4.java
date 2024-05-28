@@ -756,6 +756,11 @@ public class FhirR4 {
               .setCity((String) person.attributes.get(Person.CITY))
               .setPostalCode((String) person.attributes.get(Person.ZIP))
               .setState(state);
+      address.addExtension()
+              .setUrl("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-address-insee-code")
+              .setValue(new Coding("https://mos.esante.gouv.fr/NOS/TRE_R13-CommuneOM/FHIR/TRE-R13-CommuneOM",
+                      (String) person.attributes.get(Person.CITY_INSEE),
+                      null));
       if (COUNTRY_CODE != null) {
         address.setCountry(COUNTRY_CODE);
       }
@@ -862,6 +867,14 @@ public class FhirR4 {
             .setCity((String) person.attributes.get(Person.BIRTH_CITY))
             .setState((String) person.attributes.get(Person.BIRTH_STATE))
             .setCountry((String) person.attributes.get(Person.BIRTH_COUNTRY));
+    if (USE_FR_CORE_IG) {
+      birthplace.addExtension()
+              .setUrl("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-address-insee-code")
+              .setValue(new Coding("https://mos.esante.gouv.fr/NOS/TRE_R13-CommuneOM/FHIR/TRE-R13-CommuneOM",
+                      (String) person.attributes.get(Person.BIRTH_CITY_INSEE),
+                      null));
+    }
+
     Extension birthplaceExtension = new Extension("http://hl7.org/fhir/StructureDefinition/patient-birthPlace")
             .setValue(birthplace);
     patientResource.addExtension(birthplaceExtension);

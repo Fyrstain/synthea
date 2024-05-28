@@ -28,6 +28,7 @@ public class Demographics implements Comparable<Demographics>, Serializable {
   public long population;
   public String id;
   public String city;
+  public String cityInsee;
   public String state;
   public String county;
   public Map<String, Double> ages;
@@ -444,6 +445,7 @@ public class Demographics implements Comparable<Demographics>, Serializable {
 
     d.id = line.get("ID");
     d.city = line.get("NAME");
+    d.cityInsee = line.get("INSEE_CODE");
     d.state = line.get("STNAME");
     d.county = line.get("CTYNAME");
 

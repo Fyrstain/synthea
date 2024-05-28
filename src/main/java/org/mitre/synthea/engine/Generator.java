@@ -802,6 +802,7 @@ public class Generator {
 
     // Pull the person's location data.
     demographicsOutput.put(Person.CITY, city.city);
+    demographicsOutput.put(Person.CITY_INSEE, city.cityInsee);
     demographicsOutput.put(Person.STATE, city.state);
     demographicsOutput.put(Person.COUNTY, city.county);
 
@@ -891,6 +892,7 @@ public class Generator {
     demoAttributes.putAll(firstSeed.demographicAttributesForPerson());
     demoAttributes.put(Person.ENTITY, entity);
     demoAttributes.put(Person.BIRTH_CITY, city.city);
+    demoAttributes.put(Person.BIRTH_CITY_INSEE, city.cityInsee);
     demoAttributes.put(Person.BIRTHDATE, firstSeed.birthdateTimestamp());
 
     return demoAttributes;
