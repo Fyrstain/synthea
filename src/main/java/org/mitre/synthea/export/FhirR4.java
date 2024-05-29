@@ -749,6 +749,14 @@ public class FhirR4 {
               .setSystem("urn:oid:1.2.250.1.213.1.4.8")
               .setValue((String) person.attributes.get(Person.IDENTIFIER_SSN));
 
+      if (person.attributes.get(Person.GENDER).equals("M")) {
+        patientResource.setGender(AdministrativeGender.MALE);
+      } else if (person.attributes.get(Person.GENDER).equals("F")) {
+        patientResource.setGender(AdministrativeGender.FEMALE);
+      } else if (person.attributes.get(Person.GENDER).equals("UNK")) {
+        patientResource.setGender(AdministrativeGender.UNKNOWN);
+      }
+
       //Address
       String state = (String) person.attributes.get(Person.STATE);
       Address address = patientResource.addAddress();
