@@ -59,7 +59,10 @@ public class Person implements Serializable, RandomNumberGenerator, QuadTreeElem
   public static final String FIRST_LANGUAGE = "first_language";
   public static final String GENDER = "gender";
   public static final String MULTIPLE_BIRTH_STATUS = "multiple_birth_status";
+  //This is a phone number
   public static final String TELECOM = "telecom";
+  //This is the person's email (assigned at birth as for the phone number)
+  public static final String EMAIL = "email";
   public static final String ID = "id";
   public static final String ADDRESS = "address";
   public static final String CITY = "city";
@@ -94,9 +97,11 @@ public class Person implements Serializable, RandomNumberGenerator, QuadTreeElem
   public static final String IDENTIFIER_SITE = "identifier_site";
   public static final String IDENTIFIER_VARIANT_ID = "identifier_variant_id";
   public static final String IDENTIFIER_SEED_ID = "identifier_seed_id";
+  public static final String CONTACT_NAME_PREFIX = "contact_name_prefix";
   public static final String CONTACT_FAMILY_NAME = "contact_family_name";
   public static final String CONTACT_GIVEN_NAME = "contact_given_name";
   public static final String CONTACT_EMAIL = "contact_email";
+  public static final String CONTACT_PHONE = "contact_phone";
   public static final String CAUSE_OF_DEATH = "cause_of_death";
   public static final String SEXUAL_ORIENTATION = "sexual_orientation";
   public static final String LOCATION = "location";

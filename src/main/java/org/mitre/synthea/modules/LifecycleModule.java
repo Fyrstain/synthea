@@ -164,6 +164,11 @@ public final class LifecycleModule extends Module {
       }
       attributes.put(Person.TELECOM, phoneNumber);
 
+      if(Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+        String email = firstName + "." + lastName + "@e-mail.fr";
+        attributes.put(Person.EMAIL, email);
+      }
+
       boolean hasStreetAddress2 = person.rand() < 0.5;
       attributes.put(Person.ADDRESS, Names.fakeAddress(hasStreetAddress2, person));
     }
@@ -175,6 +180,28 @@ public final class LifecycleModule extends Module {
     String fatherFirstName = Names.fakeFirstName("M", language, person);
     // this is anglocentric where the baby gets the father's last name
     attributes.put(Person.NAME_FATHER, fatherFirstName + " " + attributes.get(Person.LAST_NAME));
+
+    //Contact Name
+    String contactGender = person.rand() < 0.5 ? "F" : "M";
+    String contactFirstName = Names.fakeFirstName(contactGender, language, person);
+    String contactLastName = Names.fakeLastName(language, person);
+    if (contactGender.equals("F")) {
+      attributes.put(Person.CONTACT_NAME_PREFIX, Config.getAsBoolean("exporter.fhir.use_fr_core_ig") ? "Mme." : "Mrs.");
+    } else {
+      attributes.put(Person.CONTACT_NAME_PREFIX, Config.getAsBoolean("exporter.fhir.use_fr_core_ig") ? "M" : "Mr.");
+    }
+    attributes.put(Person.CONTACT_GIVEN_NAME, contactFirstName);
+    attributes.put(Person.CONTACT_FAMILY_NAME, contactLastName);
+    //attributes.put(Person.CONTACT_EMAIL, contactFirstName + "." + contactLastName + "@e-mail.fr");
+    String contactPhone;
+    if(Config.getAsBoolean("exporter.fhir.use_fr_core_ig")) {
+      contactPhone = "0" + ((person.randInt(999999999)));
+    } else {
+      contactPhone = "555-" + ((person.randInt(999 - 100 + 1) + 100)) + "-"
+              + ((person.randInt(9999 - 1000 + 1) + 1000));
+    }
+    attributes.put(Person.CONTACT_PHONE, contactPhone);
+
 
     double prevalenceOfTwins =
         (double) BiometricsConfig.get("lifecycle.prevalence_of_twins", 0.02);

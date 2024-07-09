@@ -129,6 +129,7 @@ import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 
 import org.mitre.synthea.engine.Components;
 import org.mitre.synthea.engine.Components.Attachment;
+import org.mitre.synthea.export.fr.FrFHIRContactRelationship;
 import org.mitre.synthea.helpers.Config;
 import org.mitre.synthea.helpers.SimpleCSV;
 import org.mitre.synthea.helpers.Utilities;
@@ -804,16 +805,31 @@ public class FhirR4 {
     }
 
     // Contact Email
-    if (person.attributes.get(Person.CONTACT_EMAIL) != null) {
+    if (person.attributes.get(Person.CONTACT_EMAIL) != null || person.attributes.get(Person.CONTACT_PHONE) != null) {
       ContactComponent contact = new ContactComponent();
+      if (USE_FR_CORE_IG) {
+        contact.addRelationship().addCoding(FrFHIRContactRelationship.getContactRelationship(person));
+      }
       HumanName contactName = new HumanName();
       contactName.setUse(HumanName.NameUse.OFFICIAL);
+      contactName.addPrefix((String) person.attributes.get(Person.CONTACT_NAME_PREFIX));
       contactName.addGiven((String) person.attributes.get(Person.CONTACT_GIVEN_NAME));
       contactName.setFamily((String) person.attributes.get(Person.CONTACT_FAMILY_NAME));
       contact.setName(contactName);
-      contact.addTelecom().setSystem(ContactPointSystem.EMAIL)
-              .setUse(ContactPointUse.HOME)
-              .setValue((String) person.attributes.get(Person.CONTACT_EMAIL));
+      if (person.attributes.get(Person.CONTACT_EMAIL) != null) {
+        ContactPoint contactPoint = contact.addTelecom().setSystem(ContactPointSystem.EMAIL)
+                .setValue((String) person.attributes.get(Person.CONTACT_EMAIL));
+        if (USE_FR_CORE_IG) {
+          contactPoint.addExtension()
+                  .setUrl("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-contact-point-email-type")
+                  .setValue(new Coding("https://mos.esante.gouv.fr/NOS/TRE_R256-TypeMessagerie/FHIR/TRE-R256-TypeMessagerie", "AutreMessagerie", "Messagerie électronique rassemblant des acteurs légitimes à l'utiliser"));
+        }
+      }
+      if (person.attributes.get(Person.CONTACT_PHONE) != null) {
+        contact.addTelecom().setSystem(ContactPointSystem.PHONE)
+                .setUse(ContactPointUse.HOME)
+                .setValue((String) person.attributes.get(Person.CONTACT_PHONE));
+      }
       patientResource.addContact(contact);
     }
 
@@ -829,7 +845,7 @@ public class FhirR4 {
 
     // Official Name
     HumanName name = patientResource.addName();
-    name.setUse(HumanName.NameUse.OFFICIAL);
+    name.setUse(USE_FR_CORE_IG ? HumanName.NameUse.USUAL : HumanName.NameUse.OFFICIAL);
     name.addGiven((String) person.attributes.get(Person.FIRST_NAME));
     if (person.attributes.containsKey(Person.MIDDLE_NAME)) {
       name.addGiven((String) person.attributes.get(Person.MIDDLE_NAME));
@@ -845,7 +861,7 @@ public class FhirR4 {
     // Maiden Name
     if (person.attributes.get(Person.MAIDEN_NAME) != null) {
       HumanName maidenName = patientResource.addName();
-      maidenName.setUse(HumanName.NameUse.MAIDEN);
+      maidenName.setUse(USE_FR_CORE_IG ? HumanName.NameUse.OFFICIAL : HumanName.NameUse.MAIDEN);
       maidenName.addGiven((String) person.attributes.get(Person.FIRST_NAME));
       if (person.attributes.containsKey(Person.MIDDLE_NAME)) {
         maidenName.addGiven((String) person.attributes.get(Person.MIDDLE_NAME));
@@ -899,6 +915,16 @@ public class FhirR4 {
             .setUse(ContactPointUse.HOME)
             .setValue((String) person.attributes.get(Person.TELECOM));
 
+    // Email contact
+    if (person.attributes.get(Person.EMAIL) != null) {
+      patientResource.addTelecom()
+              .setSystem(ContactPointSystem.EMAIL)
+              .setValue((String) person.attributes.get(Person.EMAIL))
+              .addExtension()
+              .setUrl("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-contact-point-email-type")
+              .setValue(new Coding("https://mos.esante.gouv.fr/NOS/TRE_R256-TypeMessagerie/FHIR/TRE-R256-TypeMessagerie", "AutreMessagerie", "Messagerie électronique rassemblant des acteurs légitimes à l'utiliser"));
+    }
+
     // Marital Status (TODO See for PACS in FR Core)
     String maritalStatus = ((String) person.attributes.get(Person.MARITAL_STATUS));
     if (maritalStatus != null) {
@@ -950,6 +976,12 @@ public class FhirR4 {
 //      patientResource.addExtension(qalyExtension);
 //    }
 
+    // General Practitioner
+    if (!person.record.encounters.isEmpty()) {
+      Clinician clinician = person.record.encounters.get(0).clinician;
+      patientResource.addGeneralPractitioner().setReference("Practitioner/" + clinician.getResourceID());
+    }
+
     return newEntry(bundle, patientResource, (String) person.attributes.get(Person.ID));
   }
 
@@ -981,7 +1013,7 @@ public class FhirR4 {
                       new Coding("https://hl7.fr/ig/fhir/core/CodeSystem/fr-core-cs-identifier-type",
                               "VN", "Visit Number")))
               .setSystem(SYNTHEA_IDENTIFIER)
-              .setValue(encounterResource.getId());
+              .setValue(encounterResource.getId() != null ? encounterResource.getId() : Integer.toString(person.randInt(999999999)));
     } else if (USE_SHR_EXTENSIONS) {
       encounterResource.setMeta(
           new Meta().addProfile(SHR_EXT + "shr-encounter-EncounterPerformed"));
@@ -3448,8 +3480,7 @@ public class FhirR4 {
 
       // Identifier (RPPS Only for now)
       practitionerResource.addIdentifier()
-              // TODO Clarify system for type !!
-              .setType(new CodeableConcept().addCoding(new Coding("https://hl7.fr/ig/fhir/core/CodeSystem/fr-core-cs-v2-0203", "RPPS", "N° RPPS")))
+              .setType(new CodeableConcept().addCoding(new Coding("http://interopsante.org/fhir/CodeSystem/fr-v2-0203", "RPPS", "N° RPPS")))
               .setSystem("http://rpps.esante.gouv.fr")
               .setValue(clinician.rpps);
 
