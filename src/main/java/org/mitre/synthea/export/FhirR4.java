@@ -3637,7 +3637,7 @@ public class FhirR4 {
       // Profession
       PractitionerRole practitionerRolePro = new PractitionerRole();
       // Profile
-      practitionerRolePro.getMeta().addProfile("https://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-practitioner-role-exercice");
+      practitionerRolePro.getMeta().addProfile("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-practitioner-role-profession");
 
       // Practitioner
       practitionerRolePro.setPractitioner(new Reference()
