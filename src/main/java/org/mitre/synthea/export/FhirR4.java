@@ -3476,7 +3476,7 @@ public class FhirR4 {
               .addPrefix((String) clinician.attributes.get(Clinician.NAME_PREFIX));
     }
     if (USE_FR_CORE_IG) {
-      practitionerResource.getMeta().addProfile("http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner");
+      practitionerResource.getMeta().addProfile("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-practitioner");
 
       // Identifier (RPPS Only for now)
       practitionerResource.addIdentifier()
