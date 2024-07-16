@@ -979,7 +979,9 @@ public class FhirR4 {
     // General Practitioner
     if (!person.record.encounters.isEmpty()) {
       Clinician clinician = person.record.encounters.get(0).clinician;
-      patientResource.addGeneralPractitioner().setReference("Practitioner/" + clinician.getResourceID());
+      patientResource.addGeneralPractitioner().setIdentifier(new Identifier()
+              .setSystem("http://rpps.esante.gouv.fr")
+              .setValue(clinician.rpps));
     }
 
     return newEntry(bundle, patientResource, (String) person.attributes.get(Person.ID));
@@ -3335,6 +3337,14 @@ public class FhirR4 {
                       null)
       );
       organizationResource.setType(organizationType);
+
+      if (!StringUtils.isBlank(provider.finess)) {
+        organizationResource.addIdentifier()
+                .setType(new CodeableConcept().addCoding(new Coding("http://interopsante.org/CodeSystem/fr-v2-0203", "FINEJ", "FINESS d'entité juridique")))
+                .setSystem("https://finess.esante.gouv.fr")
+                .setValue(provider.finess);
+      }
+
     }
     if (USE_SHR_EXTENSIONS) {
       organizationResource.setMeta(new Meta().addProfile(SHR_EXT + "shr-entity-Organization"));

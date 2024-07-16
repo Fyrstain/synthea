@@ -90,6 +90,7 @@ public class Provider implements QuadTreeElement, Serializable {
   public String state;
   public String zip;
   public String fipsCountyCode;
+  public String finess;
 
   public String phone;
   public ProviderType type;
@@ -693,6 +694,7 @@ public class Provider implements QuadTreeElement, Serializable {
     d.fipsCountyCode = line.remove("fips_county");
     d.phone = line.remove("phone");
     d.ownership = line.remove("ownership");
+    d.finess = line.remove("FINESS");
 
     d.cmsCategory = line.remove("category");
     d.cmsProviderType = line.remove("provider_type_code");
@@ -794,6 +796,9 @@ public class Provider implements QuadTreeElement, Serializable {
     }
     if (this.fipsCountyCode == null) {
       this.fipsCountyCode = other.fipsCountyCode;
+    }
+    if (this.finess == null) {
+      this.finess = other.finess;
     }
     if (this.phone == null) {
       this.phone = other.phone;
