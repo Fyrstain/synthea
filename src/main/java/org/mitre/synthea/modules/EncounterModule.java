@@ -7,6 +7,7 @@ import java.util.Map;
 import org.mitre.synthea.engine.Module;
 import org.mitre.synthea.helpers.Attributes;
 import org.mitre.synthea.helpers.Attributes.Inventory;
+import org.mitre.synthea.helpers.Config;
 import org.mitre.synthea.helpers.Utilities;
 import org.mitre.synthea.world.agents.Person;
 import org.mitre.synthea.world.agents.Provider;
@@ -17,6 +18,7 @@ import org.mitre.synthea.world.concepts.HealthRecord.EncounterType;
 
 public final class EncounterModule extends Module {
 
+  private static boolean DISABLE_WELLNESS_ENCOUNTER = Config.getAsBoolean("generate.disable_wellness_encounter");
   public static final String ACTIVE_WELLNESS_ENCOUNTER = "active_wellness_encounter";
   public static final String ACTIVE_URGENT_CARE_ENCOUNTER = "active_urgent_care_encounter";
   public static final String ACTIVE_EMERGENCY_ENCOUNTER = "active_emergency_encounter";
@@ -67,7 +69,7 @@ public final class EncounterModule extends Module {
     Encounter encounter = null;
 
     // add a wellness encounter if this is the right time
-    if (person.record.timeSinceLastWellnessEncounter(time)
+    if (!DISABLE_WELLNESS_ENCOUNTER && person.record.timeSinceLastWellnessEncounter(time)
         >= recommendedTimeBetweenWellnessVisits(person, time)) {
       Code code = getWellnessVisitCode(person, time);
       encounter = createEncounter(person, time, EncounterType.WELLNESS,
