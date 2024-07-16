@@ -527,7 +527,7 @@
         "code": 449868002,
         "display": "Smokes tobacco daily (finding)"
       },
-      "direct_transition": "SDoH Check"
+      "direct_transition": "End_Of_Wellness_Encounter"
     },
     "Record_Former_Smoker": {
       "type": "Observation",
@@ -540,7 +540,7 @@
           "display": "Tobacco smoking status"
         }
       ],
-      "direct_transition": "SDoH Check",
+      "direct_transition": "End_Of_Wellness_Encounter",
       "value_code": {
         "system": "SNOMED-CT",
         "code": 8517006,
@@ -558,7 +558,7 @@
           "display": "Tobacco smoking status"
         }
       ],
-      "direct_transition": "SDoH Check",
+      "direct_transition": "End_Of_Wellness_Encounter",
       "value_code": {
         "system": "SNOMED-CT",
         "code": 266919005,
@@ -908,24 +908,6 @@
       "type": "CallSubmodule",
       "submodule": "encounter/sdoh_hrsn",
       "direct_transition": "Anxiety Screening Check"
-    },
-    "SDoH Check": {
-      "type": "Simple",
-      "conditional_transition": [
-        {
-          "transition": "PRAPARE",
-          "condition": {
-            "condition_type": "Age",
-            "operator": ">=",
-            "quantity": 18,
-            "unit": "years",
-            "value": 0
-          }
-        },
-        {
-          "transition": "Anxiety Screening Check"
-        }
-      ]
     },
     "Anxiety Screening": {
       "type": "CallSubmodule",
