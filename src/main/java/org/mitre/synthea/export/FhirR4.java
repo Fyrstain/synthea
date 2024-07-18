@@ -970,7 +970,7 @@ public class FhirR4 {
               .setSystem(SYNTHEA_IDENTIFIER)
               .setValue(encounterResource.getId() != null ? encounterResource.getId() : Integer.toString(person.randInt(999999999)));
 
-      BundleEntryComponent appointmentEntry = appointment(bundle, encounter);
+      BundleEntryComponent appointmentEntry = appointment(personEntry, bundle, encounter);
       encounterResource.addAppointment().setReference(appointmentEntry.getFullUrl());
     } else if (USE_SHR_EXTENSIONS) {
       encounterResource.setMeta(
@@ -1108,7 +1108,7 @@ public class FhirR4 {
    * @param encounter the Encounter for which the Appointment is created.
    * @return the Bundle entry.
    */
-  private static BundleEntryComponent appointment(Bundle bundle, Encounter encounter) {
+  private static BundleEntryComponent appointment(BundleEntryComponent personEntry, Bundle bundle, Encounter encounter) {
     Appointment appointmentResource = new Appointment();
     appointmentResource.getMeta().addProfile("http://hl7.fr/ig/fhir/core/StructureDefinition/fr-core-appointment");
 
@@ -1132,6 +1132,10 @@ public class FhirR4 {
         }
       }
     }
+    //Patient
+    Patient patient = (Patient) personEntry.getResource();
+    appointmentResource.addParticipant().setActor(new Reference(personEntry.getFullUrl()).setDisplay(patient.getNameFirstRep().getNameAsSingleString()))
+            .setStatus(Appointment.ParticipationStatus.ACCEPTED);
     //TODO UUID OK ?
     return newEntry(bundle, appointmentResource, UUID.randomUUID().toString());
   }
