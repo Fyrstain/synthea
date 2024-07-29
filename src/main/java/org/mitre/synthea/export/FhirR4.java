@@ -10,10 +10,12 @@ import com.google.gson.JsonObject;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
@@ -497,6 +499,8 @@ public class FhirR4 {
     Boolean pretty = Config.getAsBoolean("exporter.pretty_print", true);
     String bundleJson = FHIR_CTX.newJsonParser().setPrettyPrint(pretty)
         .encodeResourceToString(bundle);
+
+    bundleJson = new String(bundleJson.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 
     return bundleJson;
   }
